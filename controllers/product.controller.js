@@ -1,7 +1,5 @@
 const Product = require('../models/Product');
 
-const PAGE_SIZE = 3;
-
 const productController = {};
 
 productController.createProduct = async (req, res) => {
@@ -37,14 +35,14 @@ productController.createProduct = async (req, res) => {
 
 productController.getProducts = async (req, res) => {
   try {
-    const { page, name } = req.query;
+    const { page, name, pageSize } = req.query;
     const cond = name ? { name: { $regex: name, $options: 'i' } } : {};
     let query = Product.find(cond).select('-createdAt -__v');
     let response = { status: 'success' };
     if (page) {
-      query.skip((page - 1) * PAGE_SIZE).limit(PAGE_SIZE);
+      query.skip((page - 1) * pageSize).limit(pageSize);
       const totalItemNum = await Product.find(cond).count();
-      const totalPageNum = Math.ceil(totalItemNum / PAGE_SIZE);
+      const totalPageNum = Math.ceil(totalItemNum / pageSize);
       response.totalPageNum = totalPageNum;
     }
 
