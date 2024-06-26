@@ -57,4 +57,22 @@ orderController.getOrder = async (req, res) => {
   }
 };
 
+orderController.getOrderList = async (req, res) => {
+  try {
+    const orderList = await Order.find({})
+      .populate('userId')
+      .populate({
+        path: 'items',
+        populate: {
+          path: 'productId',
+          model: 'Product',
+          select: 'image name',
+        },
+      });
+    res.status(200).json({ status: 'success', data: orderList });
+  } catch (error) {
+    res.status(400).json({ status: 'fail', error: error.message });
+  }
+};
+
 module.exports = orderController;

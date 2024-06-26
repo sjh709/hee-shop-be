@@ -7,4 +7,6 @@ router.post('/', authController.authenticate, orderController.createOrder);
 
 router.get('/me', authController.authenticate, orderController.getOrder);
 
+router.get('/', authController.authenticate, orderController.getOrderList);
+
 module.exports = router;
