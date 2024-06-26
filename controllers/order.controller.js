@@ -30,6 +30,7 @@ orderController.createOrder = async (req, res) => {
       orderNum: randomStringGenerator(),
     });
     await newOrder.save();
+    // 카트 비우기
     res.status(200).json({ status: 'success', orderNum: newOrder.orderNum });
   } catch (error) {
     res.status(400).json({ status: 'fail', error: error.message });
