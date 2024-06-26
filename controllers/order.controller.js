@@ -59,7 +59,11 @@ orderController.getOrder = async (req, res) => {
 
 orderController.getOrderList = async (req, res) => {
   try {
-    const orderList = await Order.find({})
+    const { page, orderNum } = req.query;
+    const cond = orderNum
+      ? { orderNum: { $regex: orderNum, $options: 'i' } }
+      : {};
+    const orderList = await Order.find(cond)
       .populate('userId')
       .populate({
         path: 'items',
