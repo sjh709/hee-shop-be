@@ -1,6 +1,7 @@
 const Order = require('../models/Order');
 const productController = require('./product.controller');
 const { randomStringGenerator } = require('../utils/randomStringGenerator');
+const { populate } = require('dotenv');
 
 const orderController = {};
 
@@ -32,6 +33,25 @@ orderController.createOrder = async (req, res) => {
     await newOrder.save();
     // 카트 비우기
     res.status(200).json({ status: 'success', orderNum: newOrder.orderNum });
+  } catch (error) {
+    res.status(400).json({ status: 'fail', error: error.message });
+  }
+};
+
+orderController.getOrder = async (req, res) => {
+  try {
+    const { userId } = req;
+    const orderList = await Order.find({ userId })
+      .select('-shipTo -contact -updatedAt -__v')
+      .populate({
+        path: 'items',
+        populate: {
+          path: 'productId',
+          model: 'Product',
+          select: 'image name',
+        },
+      });
+    res.status(200).json({ status: 'success', data: orderList });
   } catch (error) {
     res.status(400).json({ status: 'fail', error: error.message });
   }
