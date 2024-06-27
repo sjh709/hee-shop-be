@@ -9,4 +9,11 @@ router.get('/me', authController.authenticate, orderController.getOrder);
 
 router.get('/', authController.authenticate, orderController.getOrderList);
 
+router.put(
+  '/:id',
+  authController.authenticate,
+  authController.checkAdminPermission,
+  orderController.updateOrder
+);
+
 module.exports = router;
