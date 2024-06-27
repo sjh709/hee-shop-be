@@ -43,7 +43,8 @@ orderController.createOrder = async (req, res) => {
 orderController.getOrder = async (req, res) => {
   try {
     const { userId } = req;
-    const orderList = await Order.find({ userId })
+    const { page } = req.query;
+    let query = Order.find({ userId })
       .select('-shipTo -contact -updatedAt -__v')
       .populate({
         path: 'items',
@@ -53,7 +54,17 @@ orderController.getOrder = async (req, res) => {
           select: 'image name',
         },
       });
-    res.status(200).json({ status: 'success', data: orderList });
+    let response = { state: 'success' };
+    if (page) {
+      query.skip((page - 1) * PAGE_SIZE).limit(PAGE_SIZE);
+      const totalItemNum = await Order.countDocuments({ userId });
+      const totalPageNum = Math.ceil(totalItemNum / PAGE_SIZE);
+      response.totalPageNum = totalPageNum;
+    }
+
+    const orderList = await query.exec();
+    response.data = orderList;
+    res.status(200).json(response);
   } catch (error) {
     res.status(400).json({ status: 'fail', error: error.message });
   }
