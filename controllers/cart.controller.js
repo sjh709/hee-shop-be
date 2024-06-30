@@ -93,7 +93,8 @@ cartController.getCartQty = async (req, res) => {
     const { userId } = req;
     const cart = await Cart.findOne({ userId });
     if (!cart) {
-      throw new Error('사용자의 카트를 찾을 수 없습니다.');
+      // throw new Error('사용자의 카트를 찾을 수 없습니다.');
+      return res.status(200).json({ status: 'success', qty: 0 });
     }
     res.status(200).json({ status: 'success', qty: cart.items.length });
   } catch (error) {
