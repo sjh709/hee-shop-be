@@ -35,10 +35,14 @@ productController.createProduct = async (req, res) => {
 
 productController.getProducts = async (req, res) => {
   try {
-    const { page, name, pageSize } = req.query;
-    const cond = name
-      ? { name: { $regex: name, $options: 'i' }, isDeleted: false }
-      : { isDeleted: false };
+    const { page, name, cate_no, pageSize } = req.query;
+    let cond = { isDeleted: false };
+    if (name) {
+      cond = { ...cond, name: { $regex: name, $options: 'i' } };
+    }
+    if (cate_no !== '' && cate_no !== undefined) {
+      cond = { ...cond, category: cate_no };
+    }
     let query = Product.find(cond).select('-createdAt -__v');
     let response = { status: 'success' };
     if (page) {
