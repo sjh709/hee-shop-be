@@ -49,6 +49,7 @@ orderController.getOrder = async (req, res) => {
     const { userId } = req;
     const { page } = req.query;
     let query = Order.find({ userId })
+      .sort({ createdAt: -1 })
       .select('-shipTo -contact -updatedAt -__v')
       .populate({
         path: 'items',
@@ -81,6 +82,7 @@ orderController.getOrderList = async (req, res) => {
       ? { orderNum: { $regex: orderNum, $options: 'i' } }
       : {};
     let query = Order.find(cond)
+      .sort({ createdAt: -1 })
       .populate('userId')
       .populate({
         path: 'items',
