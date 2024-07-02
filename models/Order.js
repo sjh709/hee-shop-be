@@ -19,8 +19,9 @@ const orderSchema = Schema(
         size: { type: String, required: true },
       },
     ],
+    createdAt: { type: String, default: Date.now },
   },
-  { timestamps: true }
+  { timestamps: { createdAt: false } }
 );
 orderSchema.methods.toJSON = function () {
   const obj = this._doc;

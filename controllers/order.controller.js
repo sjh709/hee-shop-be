@@ -2,6 +2,8 @@ const Order = require('../models/Order');
 const productController = require('./product.controller');
 const { randomStringGenerator } = require('../utils/randomStringGenerator');
 const { populate } = require('dotenv');
+const moment = require('moment');
+const date = moment().format('YYYY-MM-DD HH:mm:ss');
 
 const PAGE_SIZE = 5;
 
@@ -31,6 +33,7 @@ orderController.createOrder = async (req, res) => {
       contact,
       items: orderList,
       orderNum: randomStringGenerator(),
+      createdAt: date,
     });
     await newOrder.save();
     // 카트 비우기
