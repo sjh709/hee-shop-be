@@ -34,6 +34,7 @@ orderController.createOrder = async (req, res) => {
       items: orderList,
       orderNum: randomStringGenerator(),
       createdAt: date,
+      updatedAt: date,
     });
     await newOrder.save();
     // 카트 비우기
@@ -111,7 +112,7 @@ orderController.updateOrder = async (req, res) => {
     const { status } = req.body;
     const order = await Order.findByIdAndUpdate(
       id,
-      { status },
+      { status, updatedAt: date },
       { new: true }
     ).select('-updatedAt -__v');
     if (!order) {
