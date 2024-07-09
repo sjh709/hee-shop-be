@@ -3,14 +3,15 @@ const productController = require('./product.controller');
 const { randomStringGenerator } = require('../utils/randomStringGenerator');
 const { populate } = require('dotenv');
 const moment = require('moment');
-const date = moment().format('YYYY-MM-DD HH:mm:ss');
 
 const PAGE_SIZE = 5;
+const ADMIN_PAGE_SIZE = 10;
 
 const orderController = {};
 
 orderController.createOrder = async (req, res) => {
   try {
+    const date = moment().format('YYYY-MM-DD HH:mm:ss');
     const { userId } = req;
     const { shipTo, contact, totalPrice, orderList } = req.body;
     // 재고 확인 & 재고 업데이트
@@ -94,9 +95,9 @@ orderController.getOrderList = async (req, res) => {
       });
     let response = { state: 'success' };
     if (page) {
-      query.skip((page - 1) * PAGE_SIZE).limit(PAGE_SIZE);
+      query.skip((page - 1) * ADMIN_PAGE_SIZE).limit(ADMIN_PAGE_SIZE);
       const totalItemNum = await Order.find(cond).count();
-      const totalPageNum = Math.ceil(totalItemNum / PAGE_SIZE);
+      const totalPageNum = Math.ceil(totalItemNum / ADMIN_PAGE_SIZE);
       response.totalPageNum = totalPageNum;
     }
 
@@ -110,6 +111,7 @@ orderController.getOrderList = async (req, res) => {
 
 orderController.updateOrder = async (req, res) => {
   try {
+    const date = moment().format('YYYY-MM-DD HH:mm:ss');
     const { id } = req.params;
     const { status } = req.body;
     const order = await Order.findByIdAndUpdate(
