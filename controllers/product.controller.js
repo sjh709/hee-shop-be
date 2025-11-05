@@ -121,6 +121,41 @@ productController.getProductById = async (req, res) => {
   }
 };
 
+// productController.checkStock = async (item) => {
+//   // 내가 사려는 아이템 재고 정보 들고오기
+//   const product = await Product.findById(item.productId);
+//   // 내가 사려는 아이템 qty, 재고 비교
+//   // 재고가 불충분하면 메세지와 함께 데이터 반환
+//   if (product.stock[item.size] < item.qty) {
+//     return {
+//       isVerify: false,
+//       message: `${product.name}의 ${item.size} 재고가 부족합니다.`,
+//     };
+//   }
+//   // 충분하면 재고 - qty
+//   const newStock = { ...product.stock };
+//   newStock[item.size] -= item.qty;
+//   product.stock = newStock;
+//   await product.save();
+//   return { isVerify: true };
+// };
+
+// productController.checkItemListStock = async (itemList) => {
+//   const insufficientStockItems = [];
+//   // 재고 확인
+//   await Promise.all(
+//     itemList.map(async (item) => {
+//       const stockCheck = await productController.checkStock(item);
+//       if (!stockCheck.isVerify) {
+//         insufficientStockItems.push({ item, message: stockCheck.message });
+//       }
+//       return stockCheck;
+//     })
+//   );
+
+//   return insufficientStockItems;
+// };
+
 productController.checkStock = async (item) => {
   // 내가 사려는 아이템 재고 정보 들고오기
   const product = await Product.findById(item.productId);
@@ -136,22 +171,35 @@ productController.checkStock = async (item) => {
   const newStock = { ...product.stock };
   newStock[item.size] -= item.qty;
   product.stock = newStock;
-  await product.save();
-  return { isVerify: true };
+  // await product.save();
+  return { isVerify: true, product };
 };
 
 productController.checkItemListStock = async (itemList) => {
   const insufficientStockItems = [];
+  const stockUpdateProducts = []; // stock 정보 업데이트한 product 배열 만들기
   // 재고 확인
   await Promise.all(
     itemList.map(async (item) => {
       const stockCheck = await productController.checkStock(item);
       if (!stockCheck.isVerify) {
         insufficientStockItems.push({ item, message: stockCheck.message });
+      } else {
+        stockUpdateProducts.push(stockCheck.product);
       }
       return stockCheck;
     })
   );
+
+  // 재고 부족한 아이템이 하나도 없으면 그때 product.save
+  if (insufficientStockItems.length === 0) {
+    await Promise.all(
+      stockUpdateProducts.map(async (product) => {
+        await product.save();
+        return product;
+      })
+    );
+  }
 
   return insufficientStockItems;
 };
